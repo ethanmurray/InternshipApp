@@ -66,7 +66,7 @@ export default function SignUpPage() {
       // Use browser alert for web, React Native Alert for mobile
       if (typeof window !== 'undefined') {
         // Web browser
-        window.alert('Account created successfully!');
+        // window.alert('Account created successfully!');
         router.replace('/');
       } else {
         // Mobile
