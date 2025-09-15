@@ -1,51 +1,54 @@
-import { useState } from 'react';
-import { View, Text, TextInput, Button, StyleSheet, Alert } from 'react-native';
-import { Link, router } from 'expo-router';
-import { useAuth } from '../contexts/AuthContext';
+import { useState } from "react";
+import { Text, TextInput, Button, StyleSheet, Alert, View } from "react-native";
+import { router } from "expo-router";
+import { useAuth } from "../contexts/AuthContext";
 
 export default function SignInPage() {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
-  const [errorMessage, setErrorMessage] = useState('');
+  const [errorMessage, setErrorMessage] = useState("");
   const { signIn } = useAuth();
 
   const handleSignIn = async () => {
     if (!email || !password) {
-      setErrorMessage('Please fill in all fields');
+      setErrorMessage("Please fill in all fields");
       return;
     }
 
     setLoading(true);
-    setErrorMessage('');
+    setErrorMessage("");
 
-    console.log('Attempting sign in with:', { email, password: '***' });
+    console.log("Attempting sign in with:", { email, password: "***" });
     const { error } = await signIn(email, password);
 
-    console.log('Sign in result:', { error: error?.message });
+    console.log("Sign in result:", { error: error?.message });
     setLoading(false);
 
     if (error) {
       // Provide user-friendly error messages
-      let friendlyMessage = 'Sign in failed. Please try again.';
+      let friendlyMessage = "Sign in failed. Please try again.";
 
-      if (error.message.includes('Invalid login credentials')) {
-        friendlyMessage = 'Incorrect email or password. Please check your credentials and try again.';
-      } else if (error.message.includes('Email not confirmed')) {
-        friendlyMessage = 'Please check your email and click the confirmation link before signing in.';
-      } else if (error.message.includes('Too many requests')) {
-        friendlyMessage = 'Too many sign-in attempts. Please wait a few minutes and try again.';
-      } else if (error.message.includes('signup disabled')) {
-        friendlyMessage = 'New account creation is currently disabled.';
+      if (error.message.includes("Invalid login credentials")) {
+        friendlyMessage =
+          "Incorrect email or password. Please check your credentials and try again.";
+      } else if (error.message.includes("Email not confirmed")) {
+        friendlyMessage =
+          "Please check your email and click the confirmation link before signing in.";
+      } else if (error.message.includes("Too many requests")) {
+        friendlyMessage =
+          "Too many sign-in attempts. Please wait a few minutes and try again.";
+      } else if (error.message.includes("signup disabled")) {
+        friendlyMessage = "New account creation is currently disabled.";
       }
 
       setErrorMessage(friendlyMessage);
 
       // Also show alert as backup
-      Alert.alert('Sign In Failed', friendlyMessage);
+      Alert.alert("Sign In Failed", friendlyMessage);
     } else {
-      setErrorMessage('');
-      router.replace('/');
+      setErrorMessage("");
+      router.replace("/");
     }
   };
 
@@ -53,11 +56,11 @@ export default function SignInPage() {
     <View style={styles.container}>
       <Text style={styles.title}>Sign In</Text>
 
-      {errorMessage && (
+      {errorMessage ? (
         <View style={styles.errorContainer}>
           <Text style={styles.errorText}>{errorMessage}</Text>
         </View>
-      )}
+      ) : null}
 
       <TextInput
         style={styles.input}
@@ -84,11 +87,11 @@ export default function SignInPage() {
         disabled={loading}
       />
 
-      <View style={styles.linkContainer}>
-        <Text>Don't have an account? </Text>
-        <Link href="/signup" style={styles.link}>
-          <Text style={styles.linkText}>Sign Up</Text>
-        </Link>
+      <View style={[styles.linkContainer, { alignItems: "center" }]}>
+        <Text style={{ textAlign: "center" }}>{"Don't have an account? "}</Text>
+        <Text style={styles.linkText} onPress={() => router.push("/signup")}>
+          Sign Up
+        </Text>
       </View>
     </View>
   );
@@ -97,47 +100,45 @@ export default function SignInPage() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    justifyContent: 'center',
+    justifyContent: "center",
     padding: 20,
-    backgroundColor: '#fff',
+    backgroundColor: "#fff",
   },
   title: {
     fontSize: 24,
-    fontWeight: 'bold',
-    textAlign: 'center',
+    fontWeight: "bold",
+    textAlign: "center",
     marginBottom: 30,
   },
   input: {
     borderWidth: 1,
-    borderColor: '#ddd',
+    borderColor: "#ddd",
     padding: 15,
     marginBottom: 15,
     borderRadius: 8,
     fontSize: 16,
   },
   linkContainer: {
-    flexDirection: 'row',
-    justifyContent: 'center',
     marginTop: 20,
   },
   link: {
     marginLeft: 5,
   },
   linkText: {
-    color: '#007AFF',
-    fontWeight: '600',
+    color: "#007AFF",
+    fontWeight: "600",
   },
   errorContainer: {
-    backgroundColor: '#ffebee',
+    backgroundColor: "#ffebee",
     padding: 12,
     borderRadius: 8,
     marginBottom: 15,
     borderLeftWidth: 4,
-    borderLeftColor: '#f44336',
+    borderLeftColor: "#f44336",
   },
   errorText: {
-    color: '#c62828',
+    color: "#c62828",
     fontSize: 14,
-    textAlign: 'center',
+    textAlign: "center",
   },
 });

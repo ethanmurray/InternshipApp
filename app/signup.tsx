@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { View, Text, TextInput, Button, StyleSheet, Alert } from 'react-native';
-import { Link, router } from 'expo-router';
+import { router } from 'expo-router';
 import { useAuth } from '../contexts/AuthContext';
 
 export default function SignUpPage() {
@@ -82,11 +82,11 @@ export default function SignUpPage() {
     <View style={styles.container}>
       <Text style={styles.title}>Create Account</Text>
 
-      {errorMessage && (
+      {errorMessage ? (
         <View style={styles.errorContainer}>
           <Text style={styles.errorText}>{errorMessage}</Text>
         </View>
-      )}
+      ) : null}
 
       <TextInput
         style={styles.input}
@@ -113,11 +113,11 @@ export default function SignUpPage() {
         disabled={loading}
       />
 
-      <View style={styles.linkContainer}>
-        <Text>Already have an account? </Text>
-        <Link href="/signin" style={styles.link}>
-          <Text style={styles.linkText}>Sign In</Text>
-        </Link>
+      <View style={[styles.linkContainer, { alignItems: "center" }]}>
+        <Text style={{ textAlign: "center" }}>{"Already have an account? "}</Text>
+        <Text style={styles.linkText} onPress={() => router.push("/signin")}>
+          Sign In
+        </Text>
       </View>
     </View>
   );
@@ -145,8 +145,6 @@ const styles = StyleSheet.create({
     fontSize: 16,
   },
   linkContainer: {
-    flexDirection: 'row',
-    justifyContent: 'center',
     marginTop: 20,
   },
   link: {
