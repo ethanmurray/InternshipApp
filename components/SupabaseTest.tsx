@@ -11,25 +11,39 @@ export default function SupabaseTest() {
     setMessage('Testing Supabase connection...');
 
     try {
-      // Simple test to check if Supabase client is configured
-      const { data, error } = await supabase.from('_test_table_that_does_not_exist').select('*').limit(1);
+      // Test 1: Check if we can connect to Supabase
+      const { data, error } = await supabase.from('_test_table_that_does_not_exist').select('test_message').limit(1);
 
       if (error) {
-        // If we get a "relation does not exist" error, it means connection is working
+        // Check for specific error types
         if (error.message.includes('relation') && error.message.includes('does not exist')) {
-          setStatus('success');
-          setMessage('✅ Supabase connection successful!');
+          setStatus('error');
+          setMessage('❌ Test table not found. Please run the migration first.');
+        } else if (error.message.includes('JWT') || error.message.includes('Invalid API key')) {
+          setStatus('error');
+          setMessage('❌ Invalid API credentials. Check your environment variables.');
+        } else if (error.message.includes('Missing Supabase environment variables')) {
+          setStatus('error');
+          setMessage('❌ Missing environment variables. Configure EXPO_PUBLIC_SUPABASE_URL and EXPO_PUBLIC_SUPABASE_ANON_KEY.');
         } else {
           setStatus('error');
           setMessage(`❌ Connection error: ${error.message}`);
         }
+      } else if (data && data.length > 0) {
+        setStatus('success');
+        setMessage(`✅ Supabase connection successful! Message: "${data[0].test_message}"`);
       } else {
         setStatus('success');
-        setMessage('✅ Supabase connection successful!');
+        setMessage('✅ Supabase connection successful! (No test data found)');
       }
     } catch (err) {
-      setStatus('error');
-      setMessage(`❌ Connection failed: ${err instanceof Error ? err.message : 'Unknown error'}`);
+      if (err instanceof Error && err.message.includes('Missing Supabase environment variables')) {
+        setStatus('error');
+        setMessage('❌ Missing environment variables. Configure EXPO_PUBLIC_SUPABASE_URL and EXPO_PUBLIC_SUPABASE_ANON_KEY in Vercel.');
+      } else {
+        setStatus('error');
+        setMessage(`❌ Connection failed: ${err instanceof Error ? err.message : 'Unknown error'}`);
+      }
     }
   };
 
