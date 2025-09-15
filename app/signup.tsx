@@ -7,30 +7,86 @@ export default function SignUpPage() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
+  const [errorMessage, setErrorMessage] = useState('');
   const { signUp } = useAuth();
 
   const handleSignUp = async () => {
     if (!email || !password) {
-      Alert.alert('Error', 'Please fill in all fields');
+      setErrorMessage('Please fill in all fields');
+      return;
+    }
+
+    // Basic email validation
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+      setErrorMessage('Please enter a valid email address');
+      return;
+    }
+
+    // Basic password validation
+    if (password.length < 6) {
+      setErrorMessage('Password must be at least 6 characters long');
       return;
     }
 
     setLoading(true);
+    setErrorMessage('');
+
+    console.log('Attempting sign up with:', { email, password: '***' });
     const { error } = await signUp(email, password);
+
+    console.log('Sign up result:', { error });
+    console.log('Error type:', typeof error);
+    console.log('Error truthy?', !!error);
     setLoading(false);
 
     if (error) {
-      Alert.alert('Sign Up Error', error.message);
+      // Provide user-friendly error messages
+      let friendlyMessage = 'Account creation failed. Please try again.';
+
+      if (error.message.includes('email') && error.message.includes('invalid')) {
+        friendlyMessage = 'Please enter a valid email address';
+      } else if (error.message.includes('password') && error.message.includes('weak')) {
+        friendlyMessage = 'Password is too weak. Please choose a stronger password';
+      } else if (error.message.includes('User already registered')) {
+        friendlyMessage = 'An account with this email already exists. Try signing in instead.';
+      } else if (error.message.includes('signup disabled')) {
+        friendlyMessage = 'New account creation is currently disabled.';
+      } else if (error.message.includes('rate limit')) {
+        friendlyMessage = 'Too many attempts. Please wait a few minutes and try again.';
+      }
+
+      setErrorMessage(friendlyMessage);
+      Alert.alert('Sign Up Failed', friendlyMessage);
     } else {
-      Alert.alert('Success', 'Account created successfully!', [
-        { text: 'OK', onPress: () => router.replace('/') }
-      ]);
+      console.log('Success branch reached!');
+      setErrorMessage('');
+      console.log('About to show success alert');
+
+      // Use browser alert for web, React Native Alert for mobile
+      if (typeof window !== 'undefined') {
+        // Web browser
+        window.alert('Account created successfully!');
+        router.replace('/');
+      } else {
+        // Mobile
+        Alert.alert('Success', 'Account created successfully!', [
+          { text: 'OK', onPress: () => router.replace('/') }
+        ]);
+      }
+      console.log('Success alert should be displayed');
     }
   };
 
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Create Account</Text>
+
+      {errorMessage && (
+        <View style={styles.errorContainer}>
+          <Text style={styles.errorText}>{errorMessage}</Text>
+        </View>
+      )}
 
       <TextInput
         style={styles.input}
@@ -99,5 +155,18 @@ const styles = StyleSheet.create({
   linkText: {
     color: '#007AFF',
     fontWeight: '600',
+  },
+  errorContainer: {
+    backgroundColor: '#ffebee',
+    padding: 12,
+    borderRadius: 8,
+    marginBottom: 15,
+    borderLeftWidth: 4,
+    borderLeftColor: '#f44336',
+  },
+  errorText: {
+    color: '#c62828',
+    fontSize: 14,
+    textAlign: 'center',
   },
 });

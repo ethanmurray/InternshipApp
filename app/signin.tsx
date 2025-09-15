@@ -7,34 +7,44 @@ export default function SignInPage() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
+  const [errorMessage, setErrorMessage] = useState('');
   const { signIn } = useAuth();
 
   const handleSignIn = async () => {
     if (!email || !password) {
-      Alert.alert('Error', 'Please fill in all fields');
+      setErrorMessage('Please fill in all fields');
       return;
     }
 
     setLoading(true);
+    setErrorMessage('');
+
+    console.log('Attempting sign in with:', { email, password: '***' });
     const { error } = await signIn(email, password);
+
+    console.log('Sign in result:', { error: error?.message });
     setLoading(false);
 
     if (error) {
       // Provide user-friendly error messages
-      let errorMessage = 'Sign in failed. Please try again.';
+      let friendlyMessage = 'Sign in failed. Please try again.';
 
       if (error.message.includes('Invalid login credentials')) {
-        errorMessage = 'Incorrect email or password. Please check your credentials and try again.';
+        friendlyMessage = 'Incorrect email or password. Please check your credentials and try again.';
       } else if (error.message.includes('Email not confirmed')) {
-        errorMessage = 'Please check your email and click the confirmation link before signing in.';
+        friendlyMessage = 'Please check your email and click the confirmation link before signing in.';
       } else if (error.message.includes('Too many requests')) {
-        errorMessage = 'Too many sign-in attempts. Please wait a few minutes and try again.';
+        friendlyMessage = 'Too many sign-in attempts. Please wait a few minutes and try again.';
       } else if (error.message.includes('signup disabled')) {
-        errorMessage = 'New account creation is currently disabled.';
+        friendlyMessage = 'New account creation is currently disabled.';
       }
 
-      Alert.alert('Sign In Failed', errorMessage);
+      setErrorMessage(friendlyMessage);
+
+      // Also show alert as backup
+      Alert.alert('Sign In Failed', friendlyMessage);
     } else {
+      setErrorMessage('');
       router.replace('/');
     }
   };
@@ -42,6 +52,12 @@ export default function SignInPage() {
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Sign In</Text>
+
+      {errorMessage && (
+        <View style={styles.errorContainer}>
+          <Text style={styles.errorText}>{errorMessage}</Text>
+        </View>
+      )}
 
       <TextInput
         style={styles.input}
@@ -110,5 +126,18 @@ const styles = StyleSheet.create({
   linkText: {
     color: '#007AFF',
     fontWeight: '600',
+  },
+  errorContainer: {
+    backgroundColor: '#ffebee',
+    padding: 12,
+    borderRadius: 8,
+    marginBottom: 15,
+    borderLeftWidth: 4,
+    borderLeftColor: '#f44336',
+  },
+  errorText: {
+    color: '#c62828',
+    fontSize: 14,
+    textAlign: 'center',
   },
 });
