@@ -11,12 +11,20 @@ export default function SupabaseTest() {
     setMessage('Testing Supabase connection...');
 
     try {
-      // Test 1: Check if we can connect to Supabase
-      const { data, error } = await supabase.from('_test_table_that_does_not_exist').select('test_message').limit(1);
+      // First try a very basic connection test
+      const { data, error } = await supabase
+        .from('_test_table_that_does_not_exist')
+        .select('test_message')
+        .limit(1);
+
+      console.log('Supabase test response:', { data, error });
 
       if (error) {
         // Check for specific error types
-        if (error.message.includes('relation') && error.message.includes('does not exist')) {
+        if (error.message.includes('schema cache')) {
+          setStatus('error');
+          setMessage('❌ Schema cache issue. Try refreshing or check if table exists in this project.');
+        } else if (error.message.includes('relation') && error.message.includes('does not exist')) {
           setStatus('error');
           setMessage('❌ Test table not found. Please run the migration first.');
         } else if (error.message.includes('JWT') || error.message.includes('Invalid API key')) {
