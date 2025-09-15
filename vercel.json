@@ -1,0 +1,7 @@
+{
+  "name": "internship-app",
+  "buildCommand": "npm run build",
+  "outputDirectory": "dist",
+  "framework": null,
+  "installCommand": "npm install"
+}

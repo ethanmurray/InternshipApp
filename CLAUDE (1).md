@@ -1,4 +1,6 @@
-# Claude Development Guidelines
+# CLAUDE.md
+
+This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
 ## Branch Management
 - Always create a new branch for new work
@@ -10,10 +12,6 @@
 - Each change should be focused and atomic
 - Test functionality after each small increment
 - Commit frequently with clear, descriptive messages
-
-## Git Configuration
-- Always use SSH authentication for GitHub operations
-- If remote URL needs to be updated: `git remote set-url origin git@github.com:username/repo.git`
 
 ## Workflow
 1. Create new branch: `git checkout -b feature/your-feature-name`
