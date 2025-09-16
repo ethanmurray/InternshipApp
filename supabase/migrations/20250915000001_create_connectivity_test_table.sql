@@ -13,6 +13,7 @@ VALUES ('Supabase connection is working!');
 ALTER TABLE public._test_table_that_does_not_exist ENABLE ROW LEVEL SECURITY;
 
 -- Create a policy to allow anonymous read access for testing
+DROP POLICY IF EXISTS "Allow anonymous read access for testing" ON public._test_table_that_does_not_exist;
 CREATE POLICY "Allow anonymous read access for testing"
 ON public._test_table_that_does_not_exist
 FOR SELECT
